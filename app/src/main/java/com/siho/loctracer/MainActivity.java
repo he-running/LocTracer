@@ -193,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
         if ((System.currentTimeMillis()-lastBackTime)>2000){
             lastBackTime=System.currentTimeMillis();
             Toast.makeText(this,"再按一次退出",Toast.LENGTH_SHORT).show();
