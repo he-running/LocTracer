@@ -138,6 +138,7 @@ public class BaiduMapActivity extends AppCompatActivity implements BaiduMapView 
             MapStatus mapStatus=new MapStatus.Builder().zoom(BaiduMapManager.ZOOM_LEVEL).target(latLng).build();
             MapStatusUpdate mapStatusUpdate= MapStatusUpdateFactory.newMapStatus(mapStatus);
             baiduMap.animateMapStatus(mapStatusUpdate);
+            isFirstLoc=false;
         }
         MyLocationData locationData=new MyLocationData.Builder().latitude(latLng.latitude).longitude(latLng.longitude).accuracy(bdLocation.getRadius()).build();
         baiduMap.setMyLocationData(locationData);
