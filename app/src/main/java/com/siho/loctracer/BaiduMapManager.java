@@ -4,7 +4,13 @@ import android.content.Context;
 
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.utils.CoordinateConverter;
 
+/**
+ * 该类主要用于对百度地图状态进行管理，例如设置定位模式，设置开启GPS
+ * 设置定位模式，添加点线面图层，坐标转换等
+ */
 /**
  * 百度地图状态管理工具类
  * Created by hesh on 2017/9/5.
@@ -34,11 +40,17 @@ public class BaiduMapManager {
     }
 
 
-
-
-
-
-
-
+    /**
+     * GPS经纬度转百度经纬度
+     * @param latLng
+     * @return
+     */
+    private LatLng convertTheLatlng(LatLng latLng){
+        CoordinateConverter converter=new CoordinateConverter();
+        converter.from(CoordinateConverter.CoordType.GPS);
+        converter.coord(latLng);
+        LatLng desLatLng=converter.convert();
+        return desLatLng;
+    }
 
 }
