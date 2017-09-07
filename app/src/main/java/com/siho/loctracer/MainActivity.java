@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
                 .zIndex(1)
                 .icon(bitmapDescriptor)
                 .position(latLng)
-                .anchor(1.0f,1.0f);
+                .anchor(0.51f,0.65f);
 
         MarkerOptions marker2=new MarkerOptions()
                 .zIndex(2)

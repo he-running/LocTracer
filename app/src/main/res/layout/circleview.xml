@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_alignBottom="@+id/rl_circleView"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="8dp"
         android:gravity="center"
         android:background="@drawable/bg_text"
         android:textColor="@android:color/black"
