@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
@@ -22,6 +23,7 @@ import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
     private LocationClient locationClient;
     private LocationClientOption clientOption;
     private MyBDLocationListener mBDBdLocationListener;
+    private MyOnMarkerClickListener mOnMarkerClickListener;
 
     private ArrayList<String> permissionList=new ArrayList<String>();
     private boolean isFirstLoc=true;
@@ -84,8 +87,10 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
     @Event(R.id.btn_circleView)
     private void onCircleViewClick(View v){
         View view= LayoutInflater.from(MyApplication.getAppContext()).inflate(R.layout.circleview,null);
-        view.setBackgroundResource(R.mipmap.bg_solid);
+        RelativeLayout rl_circlieView= (RelativeLayout) view.findViewById(R.id.rl_circleView);
         BootstrapCircleThumbnail circleThumbnail2= (BootstrapCircleThumbnail) view.findViewById(R.id.cv_circleView);
+
+        rl_circlieView.setBackgroundResource(R.mipmap.bg_solid);
         circleThumbnail2.setImageResource(R.mipmap.cluo);
         iv_circleView.setImageBitmap(getViewBitmap(view));
     }
@@ -94,33 +99,38 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
     private void onDisplayClick(View v){
         baiduMap.clear();
 
-        MapRoundHeadView headView1=new MapRoundHeadView(getApplicationContext(),R.mipmap.hey2,R.mipmap.cluo);
-        MapRoundHeadView headView2=new MapRoundHeadView(getApplicationContext(),R.mipmap.bg_hollow,R.mipmap.cluo);
-        MapRoundHeadView headView3=new MapRoundHeadView(getApplicationContext(),R.mipmap.bg_solid,R.mipmap.cluo);
-        MapRoundHeadView headView4=new MapRoundHeadView(getApplicationContext(),R.mipmap.hi,R.mipmap.cluo);
+        MapRoundHeadView headView1=new MapRoundHeadView(getApplicationContext(),R.mipmap.bg_solid_white,R.mipmap.cluo,"18825157045");
+        MapRoundHeadView headView2=new MapRoundHeadView(getApplicationContext(),R.mipmap.bg_solid_white,R.mipmap.cluo,"18825157043");
+        MapRoundHeadView headView3=new MapRoundHeadView(getApplicationContext(),R.mipmap.bg_solid,R.mipmap.cluo,"18825157042");
+        MapRoundHeadView headView4=new MapRoundHeadView(getApplicationContext(),R.mipmap.bg_solid,R.mipmap.cluo,"18825157041");
 
         LatLng latLng2=new LatLng(latLng.latitude+0.05,latLng.longitude);
         LatLng latLng3=new LatLng(latLng.latitude,latLng.longitude+0.05);
         LatLng latLng4=new LatLng(latLng.latitude+0.05,latLng.longitude+0.05);
 
-        BitmapDescriptor bitmapDescriptor= BitmapDescriptorFactory.fromView(headView1.getView());
+        BitmapDescriptor bitmapDescriptor= BitmapDescriptorFactory.fromBitmap(getViewBitmap(headView1.getView()));
         BitmapDescriptor bitmapDescriptor2= BitmapDescriptorFactory.fromView(headView2.getView());
         BitmapDescriptor bitmapDescriptor3= BitmapDescriptorFactory.fromView(headView3.getView());
         BitmapDescriptor bitmapDescriptor4= BitmapDescriptorFactory.fromView(headView4.getView());
 
         MarkerOptions marker=new MarkerOptions()
+                .zIndex(1)
                 .draggable(true)
                 .icon(bitmapDescriptor)
                 .position(latLng);
+
         MarkerOptions marker2=new MarkerOptions()
+                .zIndex(2)
                 .draggable(true)
                 .icon(bitmapDescriptor2)
                 .position(latLng2);
         MarkerOptions marker3=new MarkerOptions()
+                .zIndex(3)
                 .draggable(true)
                 .icon(bitmapDescriptor3)
                 .position(latLng3);
         MarkerOptions marker4=new MarkerOptions()
+                .zIndex(4)
                 .draggable(true)
                 .icon(bitmapDescriptor4)
                 .position(latLng4);
@@ -137,6 +147,8 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
         mapView= (MapView) findViewById(R.id.id_mapView);
         baiduMap=mapView.getMap();
         baiduMap.setMyLocationEnabled(true);
+        mOnMarkerClickListener=new MyOnMarkerClickListener();
+        baiduMap.setOnMarkerClickListener(mOnMarkerClickListener);
         locationClient=new LocationClient(getApplicationContext());
         mBDBdLocationListener=new MyBDLocationListener();
         locationClient.registerLocationListener(mBDBdLocationListener);
@@ -232,14 +244,40 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
         }
     }
 
-    private Bitmap getViewBitmap(View addViewContent) {
+    class MyOnMarkerClickListener implements BaiduMap.OnMarkerClickListener{
 
-        addViewContent.setDrawingCacheEnabled(true);
-        addViewContent.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        addViewContent.layout(0, 0, addViewContent.getMeasuredWidth(), addViewContent.getMeasuredHeight());
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            switch (marker.getZIndex()){
+                case 1:
+                    marker.setTitle("我是C.罗纳尔多");
+                    Toast.makeText(MainActivity.this,"我是C.罗纳尔多",Toast.LENGTH_SHORT).show();
+                    break;
+                case 2:
+                    marker.setTitle("我是超强球星");
+                    Toast.makeText(MainActivity.this,"我是超强球星",Toast.LENGTH_SHORT).show();
+                    break;
+                case 3:
+                    marker.setTitle("我是超人");
+                    Toast.makeText(MainActivity.this,"我是超人",Toast.LENGTH_SHORT).show();
+                    break;
+                case 4:
+                    marker.setTitle("我是超级射手");
+                    Toast.makeText(MainActivity.this,"我是超级射手",Toast.LENGTH_SHORT).show();
+                    break;
+            }
+            return true;
+        }
+    }
 
-        addViewContent.buildDrawingCache();
-        Bitmap cacheBitmap = addViewContent.getDrawingCache();
+    private Bitmap getViewBitmap(View view) {
+
+        view.setDrawingCacheEnabled(true);
+        view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+
+        view.buildDrawingCache();
+        Bitmap cacheBitmap = view.getDrawingCache();
         Bitmap bitmap = Bitmap.createBitmap(cacheBitmap);
 
         return bitmap;

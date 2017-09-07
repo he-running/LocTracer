@@ -27,28 +27,27 @@ import java.util.ArrayList;
  * Created by hesh on 2017/9/5.
  */
 
-public class BaiduMapActivity extends AppCompatActivity implements BaiduMapView {
+public abstract  class BaiduMapActivity extends AppCompatActivity implements BaiduMapView {
 
-    private MapView mapView;
-    private BaiduMap baiduMap;
-    private LocationClient locationClient;
-    private LocationClientOption clientOption;
-    private MyBDLocationListener mBDBdLocationListener;
+     MapView mapView;
+     BaiduMap baiduMap;
+     LocationClient locationClient;
+     LocationClientOption clientOption;
+     MyBDLocationListener mBDBdLocationListener;
 
-    private ArrayList<String> permissionList=new ArrayList<String>();
-    private boolean isFirstLoc=true;
-    private long lastBackTime=0L;
-
+     ArrayList<String> permissionList=new ArrayList<String>();
+     boolean isFirstLoc=true;
+     long lastBackTime=0L;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+//        setContentView(R.layout.main);
 
 //        SDKInitializer.initialize(getApplicationContext());
-        initBaiduMap();
-        initLocOption();
-        checkPermission();
+//        initBaiduMap();
+//        initLocOption();
+//        checkPermission();
     }
 
     @Override
@@ -69,11 +68,14 @@ public class BaiduMapActivity extends AppCompatActivity implements BaiduMapView 
         destroyBaiduMap();
     }
 
+    /**
+     * 子类继承此方法时，先初始化mapview和map，再super
+     */
     @Override
     public void initBaiduMap() {
-        mapView= (MapView) findViewById(R.id.id_mapView);
-        baiduMap=mapView.getMap();
-        baiduMap.setMyLocationEnabled(true);
+//        mapView= (MapView) findViewById(R.id.id_mapView);
+//        baiduMap=mapView.getMap();
+//        baiduMap.setMyLocationEnabled(true);
         locationClient=new LocationClient(getApplicationContext());
         mBDBdLocationListener=new MyBDLocationListener();
         locationClient.registerLocationListener(mBDBdLocationListener);

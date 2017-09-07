@@ -22,8 +22,8 @@
 
         <com.beardedhen.androidbootstrap.BootstrapCircleThumbnail
             android:id="@+id/iv_circleView"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:layout_gravity="center_horizontal"
             android:src="@mipmap/hi"
             app:hasBorder="false" />
