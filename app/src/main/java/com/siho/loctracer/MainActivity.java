@@ -115,23 +115,20 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
 
         MarkerOptions marker=new MarkerOptions()
                 .zIndex(1)
-                .draggable(true)
                 .icon(bitmapDescriptor)
-                .position(latLng);
+                .position(latLng)
+                .anchor(1.0f,1.0f);
 
         MarkerOptions marker2=new MarkerOptions()
                 .zIndex(2)
-                .draggable(true)
                 .icon(bitmapDescriptor2)
                 .position(latLng2);
         MarkerOptions marker3=new MarkerOptions()
                 .zIndex(3)
-                .draggable(true)
                 .icon(bitmapDescriptor3)
                 .position(latLng3);
         MarkerOptions marker4=new MarkerOptions()
                 .zIndex(4)
-                .draggable(true)
                 .icon(bitmapDescriptor4)
                 .position(latLng4);
 
