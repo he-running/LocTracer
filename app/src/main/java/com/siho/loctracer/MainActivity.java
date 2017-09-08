@@ -28,6 +28,9 @@ import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.beardedhen.androidbootstrap.BootstrapCircleThumbnail;
+import com.siho.loctracer.clusterutil.MarkerManager;
+import com.siho.loctracer.clusterutil.clustering.Cluster;
+import com.siho.loctracer.clusterutil.clustering.ClusterManager;
 
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.Event;
@@ -35,6 +38,7 @@ import org.xutils.view.annotation.ViewInject;
 import org.xutils.x;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 @ContentView(R.layout.main)
@@ -55,6 +59,13 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
     private boolean isFirstLoc=true;
     private LatLng latLng;
     private  long lastBackTime;
+
+    //----------------百度地图点聚合--------------------//
+    private ClusterManager<MyClusterItem> clusterManager;
+
+    private MarkerManager markerManager;
+    private MarkerManager.Collection  markerCollection;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +108,14 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
 
     @Event(R.id.btn_display)
     private void onDisplayClick(View v){
+      addMarkers();
+    }
+
+    /**
+     * 向地图添加Marker点
+     */
+    public void addMarkers() {
+        // 添加Marker点
         baiduMap.clear();
 
         MapRoundHeadView headView1=new MapRoundHeadView(getApplicationContext(),R.mipmap.bg_solid_white,R.mipmap.cluo,"18825157045");
@@ -107,6 +126,11 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
         LatLng latLng2=new LatLng(latLng.latitude+0.05,latLng.longitude);
         LatLng latLng3=new LatLng(latLng.latitude,latLng.longitude+0.05);
         LatLng latLng4=new LatLng(latLng.latitude+0.05,latLng.longitude+0.05);
+        LatLng latLng5=new LatLng(latLng.latitude+0.06,latLng.longitude+0.03);
+        LatLng latLng6=new LatLng(latLng.latitude+0.03,latLng.longitude+0.07);
+        LatLng latLng7=new LatLng(latLng.latitude+0.02,latLng.longitude+0.01);
+        LatLng latLng8=new LatLng(latLng.latitude+0.08,latLng.longitude+0.07);
+        LatLng latLng9=new LatLng(latLng.latitude+0.1,latLng.longitude+0.05);
 
         BitmapDescriptor bitmapDescriptor= BitmapDescriptorFactory.fromBitmap(getViewBitmap(headView1.getView()));
         BitmapDescriptor bitmapDescriptor2= BitmapDescriptorFactory.fromView(headView2.getView());
@@ -117,26 +141,48 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
                 .zIndex(1)
                 .icon(bitmapDescriptor)
                 .position(latLng)
-                .anchor(0.51f,0.65f);
+                .anchor(0.51f,0.65f);//设置锚点
 
         MarkerOptions marker2=new MarkerOptions()
                 .zIndex(2)
                 .icon(bitmapDescriptor2)
                 .position(latLng2);
+
         MarkerOptions marker3=new MarkerOptions()
                 .zIndex(3)
                 .icon(bitmapDescriptor3)
                 .position(latLng3);
+
         MarkerOptions marker4=new MarkerOptions()
                 .zIndex(4)
                 .icon(bitmapDescriptor4)
                 .position(latLng4);
+//
+//        baiduMap.addOverlay(marker);
+//        baiduMap.addOverlay(marker2);
+//        baiduMap.addOverlay(marker3);
+//        baiduMap.addOverlay(marker4);
 
-        baiduMap.addOverlay(marker);
-        baiduMap.addOverlay(marker2);
-        baiduMap.addOverlay(marker3);
-        baiduMap.addOverlay(marker4);
-        Toast.makeText(MainActivity.this,"hello",Toast.LENGTH_SHORT).show();
+//        markerCollection.clear();
+//        markerCollection.addMarker(marker);
+//        markerCollection.addMarker(marker2);
+//        markerCollection.addMarker(marker3);
+//        markerCollection.addMarker(marker4);
+
+        List itemList=new ArrayList<>();
+        itemList.add(new MyClusterItem(latLng,headView2.getView()));
+        itemList.add(new MyClusterItem(latLng2,headView2.getView()));
+        itemList.add(new MyClusterItem(latLng3,headView3.getView()));
+        itemList.add(new MyClusterItem(latLng4,headView4.getView()));
+        itemList.add(new MyClusterItem(latLng5,headView1.getView()));
+        itemList.add(new MyClusterItem(latLng6,headView2.getView()));
+        itemList.add(new MyClusterItem(latLng7,headView2.getView()));
+        itemList.add(new MyClusterItem(latLng8,headView2.getView()));
+        itemList.add(new MyClusterItem(latLng9,headView2.getView()));
+
+        clusterManager.clearItems();
+        clusterManager.addItems(itemList);
+        clusterManager.cluster();
     }
 
     @Override
@@ -144,11 +190,33 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
         mapView= (MapView) findViewById(R.id.id_mapView);
         baiduMap=mapView.getMap();
         baiduMap.setMyLocationEnabled(true);
-        mOnMarkerClickListener=new MyOnMarkerClickListener();
-        baiduMap.setOnMarkerClickListener(mOnMarkerClickListener);
+//        mOnMarkerClickListener=new MyOnMarkerClickListener();
+//        baiduMap.setOnMarkerClickListener(mOnMarkerClickListener);
         locationClient=new LocationClient(getApplicationContext());
         mBDBdLocationListener=new MyBDLocationListener();
         locationClient.registerLocationListener(mBDBdLocationListener);
+
+        clusterManager=new ClusterManager<MyClusterItem>(getApplicationContext(),baiduMap);
+        baiduMap.setOnMapStatusChangeListener(clusterManager);
+        baiduMap.setOnMarkerClickListener(clusterManager);
+        clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MyClusterItem>() {
+            @Override
+            public boolean onClusterClick(Cluster<MyClusterItem> cluster) {
+                Toast.makeText(MainActivity.this,
+                        "有" + cluster.getSize() + "个点", Toast.LENGTH_SHORT).show();
+
+                return true;
+            }
+        });
+        clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MyClusterItem>() {
+            @Override
+            public boolean onClusterItemClick(MyClusterItem item) {
+                Toast.makeText(MainActivity.this,
+                        "点击单个Item", Toast.LENGTH_SHORT).show();
+
+                return true;
+            }
+        });
     }
 
     @Override
@@ -190,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
     public void initLocOption() {
         clientOption=new LocationClientOption();
         clientOption.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
-        clientOption.setScanSpan(BaiduMapManager.SCAN_INTERVAL);
+        clientOption.setScanSpan(2000);
         clientOption.setNeedDeviceDirect(true);
         clientOption.setCoorType("bd09ll");
         clientOption.setIsNeedAddress(true);
@@ -212,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
     public void navigateTo(BDLocation bdLocation) {
         latLng=new LatLng(bdLocation.getLatitude(),bdLocation.getLongitude());
         if (isFirstLoc){
-            MapStatus mapStatus=new MapStatus.Builder().zoom(BaiduMapManager.ZOOM_LEVEL).target(latLng).build();
+            MapStatus mapStatus=new MapStatus.Builder().zoom(16.0f).target(latLng).build();
             MapStatusUpdate mapStatusUpdate= MapStatusUpdateFactory.newMapStatus(mapStatus);
             baiduMap.animateMapStatus(mapStatusUpdate);
             isFirstLoc=false;
@@ -267,6 +335,11 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
         }
     }
 
+    /**
+     * 把view转成bitmap
+     * @param view
+     * @return
+     */
     private Bitmap getViewBitmap(View view) {
 
         view.setDrawingCacheEnabled(true);
@@ -290,4 +363,5 @@ public class MainActivity extends AppCompatActivity implements BaiduMapView{
             finish();
         }
     }
+
 }
